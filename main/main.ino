@@ -141,7 +141,7 @@ void onConnectedController(ControllerPtr ctl) {
 void onDisconnectedController(ControllerPtr ctl) {
   Serial.printf("Controller disconnected.");
   controller = nullptr;
-  /* Importante: Se paramos os motores se o robô perder conexão com o controle. */
+  /* Importante: Paramos os motores se o robô perder conexão com o controle. */
   emergency_stop();
 }
 

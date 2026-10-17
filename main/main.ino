@@ -66,32 +66,32 @@ static const uint8_t IN3 = 33;
 static const uint8_t IN4 = 27;
 
 void go_forward() {
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
 
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
 }
 
 void go_left() {
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
 
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
 }
 
 void go_right() {
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
 
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
 }
 
 void go_backward() {
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
 
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
@@ -112,7 +112,7 @@ void emergency_stop() {
 /* ========================================================================================== */
 static const char *controller_mac = "03:21:05:26:0F:C3";
 ControllerPtr controller = nullptr;
-static const char *VERSION = "0.0.1";
+static const char *VERSION = "0.0.2";
 
 /* Este callback é chamado sempre que um novo controle conectar.*/
 void onConnectedController(ControllerPtr ctl) {

@@ -56,15 +56,23 @@
                                         @@@@@@@@@@@@@@@@@@@@                                        
 */
 
+/* Código baseado no exemplo de controle da biblioteca Bluepad32 */
+
 #include <Arduino.h>
 #include <Bluepad32.h>
 #include <uni.h>
 
+
+/* === Funções de movimento === */
 static const uint8_t IN1 = 13;
 static const uint8_t IN2 = 25;
 static const uint8_t IN3 = 33;
 static const uint8_t IN4 = 27;
-
+/* As entradas IN1 - IN4 são
+ * acionadas de acordo com as
+ * conexões físicas do motor com
+ * a ponte H.
+ */
 void go_forward() {
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, HIGH);
@@ -110,6 +118,7 @@ void emergency_stop() {
 }
 
 /* ========================================================================================== */
+/* MAC do controle é hardcodado porque não se espera que mudemos o controle. */
 static const char *controller_mac = "03:21:05:26:0F:C3";
 ControllerPtr controller = nullptr;
 static const char *VERSION = "0.0.2";
@@ -132,9 +141,13 @@ void onConnectedController(ControllerPtr ctl) {
 void onDisconnectedController(ControllerPtr ctl) {
   Serial.printf("Controller disconnected.");
   controller = nullptr;
+  /* Importante: Se paramos os motores se o robô perder conexão com o controle. */
   emergency_stop();
 }
 
+/* Função de debug.
+ * Atualmente inutilizada.
+ */
 void dumpGamepad(ControllerPtr ctl) {
     Serial.printf(
         "idx=%d, dpad: 0x%02x, buttons: 0x%04x, axis L: %4d, %4d, axis R: %4d, %4d, brake: %4d, throttle: %4d, "
@@ -158,6 +171,8 @@ void dumpGamepad(ControllerPtr ctl) {
     );
 }
 
+/* Esta função é chamada quando recebemos algo do controle */
+/* O código é auto explicativo */
 void processGamepad(ControllerPtr ctl) {
   switch(ctl->dpad()) {
     case DPAD_UP:
@@ -179,16 +194,18 @@ void processGamepad(ControllerPtr ctl) {
 
 // Arduino setup function. Runs in CPU 1
 void setup() {
+  /* Configuração de pinos */
   Serial.begin(115200);
-
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
 
+  /* Começamos com o robô parado */
   emergency_stop();
   
-  /* Setup the Bluepad32 callbacks */
+  /* Configura a biblioteca de comunicação para
+   * utilizar nossos callbacks. */
   BP32.setup(&onConnectedController, &onDisconnectedController);
 
   // "forgetBluetoothKeys()" should be called when the user performs
@@ -212,6 +229,7 @@ void setup() {
   uni_bt_allowlist_set_enabled(true);
 
 
+  /* Mensagem de debug */
   Serial.println(" __  __                       __  __ _      ___ ");
   Serial.println("|  \\/  | ___  ___  ___  ___  |  \\/  | | __ |_ _|");
   Serial.println("| |\\/| |/ _ \\/ __|/ _ \\/ __| | |\\/| | |/ /  | | ");
@@ -228,18 +246,11 @@ void setup() {
 
 // Arduino loop function. Runs in CPU 1.
 void loop() {
-    // This call fetches all the controllers' data.
-    // Call this function in your main loop.
+    /* Chama nossa função de controle se recebermos
+     * dados novos do controle. */
     bool dataUpdated = BP32.update();
     if (dataUpdated && controller != nullptr)
         processGamepad(controller);
 
-    // The main loop must have some kind of "yield to lower priority task" event.
-    // Otherwise, the watchdog will get triggered.
-    // If your main loop doesn't have one, just add a simple `vTaskDelay(1)`.
-    // Detailed info here:
-    // https://stackoverflow.com/questions/66278271/task-watchdog-got-triggered-the-tasks-did-not-reset-the-watchdog-in-time
-
-    //     vTaskDelay(1);
     delay(150);
 }
